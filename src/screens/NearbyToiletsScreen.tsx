@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -10,11 +11,15 @@ import {
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/routes';
+
+type NavigationProps = NativeStackNavigationProp<RootStackParamList, 'NearbyToilets'>;
 
 export default function NearbyToiletsScreen() {
   // État pour afficher/masquer le popup
   const [menuVisible, setMenuVisible] = useState(false);
-
+  const navigation = useNavigation<NavigationProps>();
   // État pour l'accordéon (Ynov Toilet)
   const [ynovExpanded, setYnovExpanded] = useState(false);
 
@@ -129,7 +134,13 @@ export default function NearbyToiletsScreen() {
               <Text style={styles.closeButtonText}>×</Text>
             </Pressable>
 
-            <TouchableOpacity style={[styles.menuOption, styles.admin]} onPress={() => {}}>
+            <TouchableOpacity 
+              style={[styles.menuOption, styles.admin]} 
+              onPress={() => {
+                setMenuVisible(false);
+                navigation.navigate('AdminCaptors');
+              }}
+              >
               <Text style={styles.menuOptionText}>Connect as Admin</Text>
             </TouchableOpacity>
 
