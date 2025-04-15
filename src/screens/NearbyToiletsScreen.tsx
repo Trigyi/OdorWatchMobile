@@ -58,39 +58,50 @@ export default function NearbyToiletsScreen() {
       </View>
 
       {/* Accordéon Ynov Toilet */}
-      <View style={styles.toiletCard}>
-        <TouchableOpacity onPress={() => setYnovExpanded(!ynovExpanded)}>
-          <Text style={styles.locationName}>Ynov Toilet</Text>
-          <Text style={styles.distance}>Distance: 600m</Text>
-        </TouchableOpacity>
-        {ynovExpanded && (
-          <View style={styles.accordionContent}>
-            <View style={styles.subToilet}>
-              <Text style={styles.subToiletTitle}>Toilet N°1</Text>
-              <View style={styles.statusTagRed}>
-                <MaterialIcons name="cancel" size={14} color="#DC2626" />
-                <Text style={styles.statusTextRed}>Occupied</Text>
-              </View>
-            </View>
-            <View style={styles.subToilet}>
-              <Text style={styles.subToiletTitle}>Toilet N°2</Text>
-              <View style={styles.statusTagBlue}>
-                <FontAwesome name="smile-o" size={14} color="#4F46E5" />
-                <Text style={styles.statusTextBlue}>Usable</Text>
-              </View>
-            </View>
-            <View style={styles.subToilet}>
-              <Text style={styles.subToiletTitle}>Toilet N°3</Text>
-              <View style={styles.statusTagOrange}>
-                <Entypo name="warning" size={14} color="#F59E0B" />
-                <Text style={styles.statusTextOrange}>Stinky</Text>
-              </View>
-            </View>
-          </View>
-        )}
-      </View>
 
       <View style={styles.toiletCard}>
+      <TouchableOpacity 
+        onPress={() => setYnovExpanded(!ynovExpanded)} 
+        style={styles.accordionHeader}
+      >
+        <View>
+          <Text style={styles.locationName}>Ynov Toilet</Text>
+          <Text style={styles.distance}>Distance: 600m</Text>
+        </View>
+        <Entypo 
+          name={ynovExpanded ? "chevron-up" : "chevron-down"} 
+          size={24} 
+          color="#333" 
+        />
+      </TouchableOpacity>
+      {ynovExpanded && (
+        <View style={styles.accordionContent}>
+          <View style={styles.subToilet}>
+            <Text style={styles.subToiletTitle}>Toilet N°1</Text>
+            <View style={styles.statusTagRed}>
+              <MaterialIcons name="cancel" size={14} color="#DC2626" />
+              <Text style={styles.statusTextRed}>Occupied</Text>
+            </View>
+          </View>
+          <View style={styles.subToilet}>
+            <Text style={styles.subToiletTitle}>Toilet N°2</Text>
+            <View style={styles.statusTagBlue}>
+              <FontAwesome name="smile-o" size={14} color="#4F46E5" />
+              <Text style={styles.statusTextBlue}>Usable</Text>
+            </View>
+          </View>
+          <View style={styles.subToilet}>
+            <Text style={styles.subToiletTitle}>Toilet N°3</Text>
+            <View style={styles.statusTagOrange}>
+              <Entypo name="warning" size={14} color="#F59E0B" />
+              <Text style={styles.statusTextOrange}>Stinky</Text>
+            </View>
+          </View>
+        </View>
+      )}
+    </View>
+    
+    <View style={styles.toiletCard}>
         <Text style={styles.locationName}>Jeanne d’Arc Toilet</Text>
         <View style={styles.statusRow}>
           <Text style={styles.distance}>Distance: 1.2km</Text>
@@ -100,6 +111,7 @@ export default function NearbyToiletsScreen() {
           </View>
         </View>
       </View>
+
 
       {/* -- MODAL POUR LE MENU -- */}
       <Modal
@@ -284,4 +296,10 @@ const styles = StyleSheet.create({
   closeApp: {
     backgroundColor: '#868E96',
   },
+  accordionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }
+  
 });
