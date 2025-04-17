@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   Modal,
   Pressable,
+  TextInput,
+  Alert,
 } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { FontAwesome, MaterialIcons, Entypo } from '@expo/vector-icons';
@@ -17,11 +19,26 @@ import { RootStackParamList } from '../navigation/routes';
 type NavigationProps = NativeStackNavigationProp<RootStackParamList, 'NearbyToilets'>;
 
 export default function NearbyToiletsScreen() {
-  // État pour afficher/masquer le popup
   const [menuVisible, setMenuVisible] = useState(false);
-  const navigation = useNavigation<NavigationProps>();
-  // État pour l'accordéon (Ynov Toilet)
   const [ynovExpanded, setYnovExpanded] = useState(false);
+  const [codeModalVisible, setCodeModalVisible] = useState(false);
+  const [adminCode, setAdminCode] = useState('');
+  const navigation = useNavigation<NavigationProps>();
+
+  const handleAdminLogin = () => {
+    setMenuVisible(false);
+    setCodeModalVisible(true);
+  };
+
+  const verifyAdminCode = () => {
+    if (adminCode === '1234') {
+      setCodeModalVisible(false);
+      setAdminCode('');
+      navigation.navigate('AdminCaptors');
+    } else {
+      Alert.alert('Incorrect Code', 'The code you entered is incorrect.');
+    }
+  };
 
   return (
     <ScrollView style={styles.container}>
@@ -31,7 +48,7 @@ export default function NearbyToiletsScreen() {
 
         <TouchableOpacity
           style={styles.menuButton}
-          onPress={() => setMenuVisible(true)} // Affiche le popup
+          onPress={() => setMenuVisible(true)}
         >
           <Text style={styles.menuText}>Menu</Text>
         </TouchableOpacity>
@@ -50,7 +67,7 @@ export default function NearbyToiletsScreen() {
         <Marker coordinate={{ latitude: 43.6047, longitude: 1.4442 }} />
       </MapView>
 
-      {/* -- Toilets List (on garde l'existant) -- */}
+      {/* -- Toilets List -- */}
       <View style={styles.toiletCard}>
         <Text style={styles.locationName}>Compans-Caffarelli Toilet</Text>
         <View style={styles.statusRow}>
@@ -62,51 +79,44 @@ export default function NearbyToiletsScreen() {
         </View>
       </View>
 
-      {/* Accordéon Ynov Toilet */}
+      {/* -- Ynov Accordion -- */}
+      <View style={styles.toiletCard}>
+        <TouchableOpacity onPress={() => setYnovExpanded(!ynovExpanded)} style={styles.accordionHeader}>
+          <View>
+            <Text style={styles.locationName}>Ynov Toilet</Text>
+            <Text style={styles.distance}>Distance: 600m</Text>
+          </View>
+          <Entypo name={ynovExpanded ? "chevron-up" : "chevron-down"} size={24} color="#333" />
+        </TouchableOpacity>
+
+        {ynovExpanded && (
+          <View style={styles.accordionContent}>
+            <View style={styles.subToilet}>
+              <Text style={styles.subToiletTitle}>Toilet N°1</Text>
+              <View style={styles.statusTagRed}>
+                <MaterialIcons name="cancel" size={14} color="#DC2626" />
+                <Text style={styles.statusTextRed}>Occupied</Text>
+              </View>
+            </View>
+            <View style={styles.subToilet}>
+              <Text style={styles.subToiletTitle}>Toilet N°2</Text>
+              <View style={styles.statusTagBlue}>
+                <FontAwesome name="smile-o" size={14} color="#4F46E5" />
+                <Text style={styles.statusTextBlue}>Usable</Text>
+              </View>
+            </View>
+            <View style={styles.subToilet}>
+              <Text style={styles.subToiletTitle}>Toilet N°3</Text>
+              <View style={styles.statusTagOrange}>
+                <Entypo name="warning" size={14} color="#F59E0B" />
+                <Text style={styles.statusTextOrange}>Stinky</Text>
+              </View>
+            </View>
+          </View>
+        )}
+      </View>
 
       <View style={styles.toiletCard}>
-      <TouchableOpacity 
-        onPress={() => setYnovExpanded(!ynovExpanded)} 
-        style={styles.accordionHeader}
-      >
-        <View>
-          <Text style={styles.locationName}>Ynov Toilet</Text>
-          <Text style={styles.distance}>Distance: 600m</Text>
-        </View>
-        <Entypo 
-          name={ynovExpanded ? "chevron-up" : "chevron-down"} 
-          size={24} 
-          color="#333" 
-        />
-      </TouchableOpacity>
-      {ynovExpanded && (
-        <View style={styles.accordionContent}>
-          <View style={styles.subToilet}>
-            <Text style={styles.subToiletTitle}>Toilet N°1</Text>
-            <View style={styles.statusTagRed}>
-              <MaterialIcons name="cancel" size={14} color="#DC2626" />
-              <Text style={styles.statusTextRed}>Occupied</Text>
-            </View>
-          </View>
-          <View style={styles.subToilet}>
-            <Text style={styles.subToiletTitle}>Toilet N°2</Text>
-            <View style={styles.statusTagBlue}>
-              <FontAwesome name="smile-o" size={14} color="#4F46E5" />
-              <Text style={styles.statusTextBlue}>Usable</Text>
-            </View>
-          </View>
-          <View style={styles.subToilet}>
-            <Text style={styles.subToiletTitle}>Toilet N°3</Text>
-            <View style={styles.statusTagOrange}>
-              <Entypo name="warning" size={14} color="#F59E0B" />
-              <Text style={styles.statusTextOrange}>Stinky</Text>
-            </View>
-          </View>
-        </View>
-      )}
-    </View>
-    
-    <View style={styles.toiletCard}>
         <Text style={styles.locationName}>Jeanne d’Arc Toilet</Text>
         <View style={styles.statusRow}>
           <Text style={styles.distance}>Distance: 1.2km</Text>
@@ -117,43 +127,69 @@ export default function NearbyToiletsScreen() {
         </View>
       </View>
 
-
-      {/* -- MODAL POUR LE MENU -- */}
+      {/* -- MODAL MENU -- */}
       <Modal
         visible={menuVisible}
         transparent={true}
         animationType="fade"
         onRequestClose={() => setMenuVisible(false)}
       >
-        {/* fond gris transparent */}
         <View style={styles.modalOverlay}>
-          {/* Contenu du menu */}
           <View style={styles.modalContainer}>
-            {/* Bouton fermer (X) */}
             <Pressable style={styles.closeButton} onPress={() => setMenuVisible(false)}>
               <Text style={styles.closeButtonText}>×</Text>
             </Pressable>
 
-            <TouchableOpacity 
-              style={[styles.menuOption, styles.admin]} 
-              onPress={() => {
-                setMenuVisible(false);
-                navigation.navigate('AdminCaptors');
-              }}
-              >
+            <TouchableOpacity style={[styles.menuOption, styles.admin]} onPress={handleAdminLogin}>
               <Text style={styles.menuOptionText}>Connect as Admin</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.menuOption, styles.report]} onPress={() => {}}>
+            <TouchableOpacity style={[styles.menuOption, styles.report]}>
               <Text style={styles.menuOptionText}>Report a Problem</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.menuOption, styles.settings]} onPress={() => {}}>
+            <TouchableOpacity style={[styles.menuOption, styles.settings]}>
               <Text style={styles.menuOptionText}>Settings</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.menuOption, styles.closeApp]} onPress={() => {}}>
+            <TouchableOpacity style={[styles.menuOption, styles.closeApp]}>
               <Text style={styles.menuOptionText}>Close the application</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* -- MODAL CODE -- */}
+      <Modal
+        visible={codeModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setCodeModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={{ fontWeight: 'bold', fontSize: 16, marginBottom: 10 }}>Enter Admin Code</Text>
+            <TextInput
+              style={{
+                backgroundColor: '#eee',
+                paddingHorizontal: 10,
+                paddingVertical: 6,
+                borderRadius: 8,
+                width: '100%',
+                marginBottom: 12,
+                textAlign: 'center',
+              }}
+              keyboardType="numeric"
+              secureTextEntry
+              value={adminCode}
+              onChangeText={setAdminCode}
+              placeholder="Enter code"
+            />
+            <TouchableOpacity
+              style={{ backgroundColor: '#4F46E5', padding: 10, borderRadius: 8, width: '100%', alignItems: 'center' }}
+              onPress={verifyAdminCode}
+            >
+              <Text style={{ color: '#fff', fontWeight: 'bold' }}>Confirm</Text>
             </TouchableOpacity>
           </View>
         </View>
